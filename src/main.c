@@ -136,7 +136,7 @@ int main(void)
 	int16_t rcvLen;
 	uint8_t rcvBuf[20], bufSize[] = {2, 2, 2, 2};
 	uint32_t ticks=0, i=0;;
-	//trace_initialize();
+	trace_initialize();
 	/* USER CODE END 1 */
 
 	/* MCU Configuration--------------------------------------------------------*/
@@ -173,7 +173,7 @@ int main(void)
 			.gw 	= {192, 168, 2, 1}};					// Gateway address
 	wizchip_setnetinfo(&netInfo);
 	wizchip_getnetinfo(&netInfo);
-	//trace_puts("Starting demo\n");
+	trace_puts("Starting demo\n");
 
 	reconnect:
 
@@ -201,43 +201,37 @@ int main(void)
 					/* Let's send a welcome message and closing socket */
 
 					recv(0, msg_rcv, sizeof(msg_rcv));
-					//trace_puts(msg_rcv);
-					i++;
+					trace_puts(msg_rcv);
 
 					ticks = HAL_GetTick();
 					sprintf(msg, "time since boot is : %lu ms\n", ticks);
 
 					if(retVal = send(0, msg, strlen(msg)))
 						//PRINT_STR(SENT_MESSAGE_MSG);
-						//trace_puts(SENT_MESSAGE_MSG);
-						i++;
+						trace_puts(SENT_MESSAGE_MSG);
 					else { /* Ops: something went wrong during data transfer */
 						sprintf(msg, WRONG_RETVAL_MSG, retVal);
 						//PRINT_STR(msg);
-						//trace_puts(msg);
-						i++;
+						trace_puts(msg);
 					}
 					break;
 				}
 				else { /* Something went wrong with remote peer, maybe the connection was closed unexpectedly */
 					sprintf(msg, WRONG_STATUS_MSG, sockStatus);
 					//PRINT_STR(msg);
-					//trace_puts(msg);
-					i++;
+					trace_puts(msg);
 					break;
 				}
 			}
 
 		} else /* Ops: socket not in LISTEN mode. Something went wrong */
 			//PRINT_STR(LISTEN_ERR_MSG);
-			//trace_puts(LISTEN_ERR_MSG);
-			i++;
+			trace_puts(LISTEN_ERR_MSG);
 
 	} else { /* Can't open the socket. This means something is wrong with W5100 configuration: maybe SPI issue? */
 		sprintf(msg, WRONG_RETVAL_MSG, retVal);
 		//PRINT_STR(msg);
-		//trace_puts(msg);
-		i++;
+		trace_puts(msg);
 	}
 
 	/* We close the socket and start a connection again */
