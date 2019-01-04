@@ -83,6 +83,7 @@ I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi1;
 SPI_HandleTypeDef hspi2;
+UART_HandleTypeDef huart1;
 
 PCD_HandleTypeDef hpcd_USB_FS;
 char msg[60];
@@ -99,6 +100,7 @@ static void MX_I2C1_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USB_PCD_Init(void);
 static void MX_SPI2_Init(void);
+static void MX_UART1_Init();
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -161,6 +163,7 @@ int main(void)
 	MX_SPI1_Init();
 	MX_USB_PCD_Init();
 	MX_SPI2_Init();
+	MX_UART1_Init();
 	/* USER CODE BEGIN 2 */
 	reg_wizchip_cs_cbfunc(cs_sel, cs_desel);
 	reg_wizchip_spi_cbfunc(spi_rb, spi_wb);
@@ -168,12 +171,15 @@ int main(void)
 
 	wizchip_init(bufSize, bufSize);
 	wiz_NetInfo netInfo = { .mac 	= {0x00, 0x08, 0xdc, 0xab, 0xcd, 0xef},	// Mac address
-			.ip 	= {192, 168, 2, 192},					// IP address
+			.ip 	= {192, 168, 0, 192},					// IP address
 			.sn 	= {255, 255, 255, 0},					// Subnet mask
 			.gw 	= {192, 168, 2, 1}};					// Gateway address
 	wizchip_setnetinfo(&netInfo);
 	wizchip_getnetinfo(&netInfo);
 	trace_puts("Starting demo\n");
+	HAL_UART_Transmit(&huart1, "starting from stm32 uart\n\r", 64, 100);
+	sprintf(msg, "ip: %d.%d.%d.%d\r\n", netInfo.ip[0], netInfo.ip[1], netInfo.ip[2], netInfo.ip[3]);
+	HAL_UART_Transmit(&huart1, msg, strlen(msg), 100);
 
 	reconnect:
 
@@ -204,7 +210,7 @@ int main(void)
 					trace_puts(msg_rcv);
 
 					ticks = HAL_GetTick();
-					sprintf(msg, "time since boot is : %lu ms\n", ticks);
+					sprintf(msg, "time since boot is : %lu ms\nwafa :\"(\n", ticks);
 
 					if(retVal = send(0, msg, strlen(msg)))
 						//PRINT_STR(SENT_MESSAGE_MSG);
@@ -425,6 +431,32 @@ static void MX_SPI2_Init(void)
 	/* USER CODE BEGIN SPI2_Init 2 */
 
 	/* USER CODE END SPI2_Init 2 */
+
+}
+
+static void MX_UART1_Init()
+{
+	GPIO_InitTypeDef uart_gpio;
+
+	huart1.Instance = USART1 ;
+	huart1.Init.BaudRate = 115200;
+	huart1.Init.WordLength = UART_WORDLENGTH_8B;
+	huart1.Init.StopBits = UART_STOPBITS_1;
+	huart1.Init.Parity = UART_PARITY_NONE;
+	huart1.Init.Mode = UART_MODE_TX_RX;
+	huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+
+	__HAL_RCC_USART1_CLK_ENABLE();
+
+	uart_gpio.Pin = GPIO_PIN_9 | GPIO_PIN_10 ;
+	uart_gpio.Mode = GPIO_MODE_AF_PP ;
+	uart_gpio.Speed = GPIO_SPEED_FREQ_HIGH ;
+	uart_gpio.Alternate = GPIO_AF7_USART1;
+
+	HAL_GPIO_Init(GPIOA, &uart_gpio);
+	HAL_UART_Init(&huart1);
+
 
 }
 

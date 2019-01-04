@@ -27,6 +27,8 @@ src/main.o: ../src/main.c ../include/main.h \
  ../system/include/stm32f3xx/stm32f3xx_hal_pwr_ex.h \
  ../system/include/stm32f3xx/stm32f3xx_hal_spi.h \
  ../system/include/stm32f3xx/stm32f3xx_hal_spi_ex.h \
+ ../system/include/stm32f3xx/stm32f3xx_hal_uart.h \
+ ../system/include/stm32f3xx/stm32f3xx_hal_uart_ex.h \
  ../ioLibrary_Driver/Ethernet/wizchip_conf.h \
  ../ioLibrary_Driver/Ethernet/W5100/w5100.h \
  ../system/include/diag/Trace.h ../ioLibrary_Driver/Ethernet/socket.h \
@@ -89,6 +91,10 @@ src/main.o: ../src/main.c ../include/main.h \
 ../system/include/stm32f3xx/stm32f3xx_hal_spi.h:
 
 ../system/include/stm32f3xx/stm32f3xx_hal_spi_ex.h:
+
+../system/include/stm32f3xx/stm32f3xx_hal_uart.h:
+
+../system/include/stm32f3xx/stm32f3xx_hal_uart_ex.h:
 
 ../ioLibrary_Driver/Ethernet/wizchip_conf.h:
 

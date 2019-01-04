@@ -27,6 +27,8 @@ src/stm32f3xx_it.o: ../src/stm32f3xx_it.c ../include/main.h \
  ../system/include/stm32f3xx/stm32f3xx_hal_pwr_ex.h \
  ../system/include/stm32f3xx/stm32f3xx_hal_spi.h \
  ../system/include/stm32f3xx/stm32f3xx_hal_spi_ex.h \
+ ../system/include/stm32f3xx/stm32f3xx_hal_uart.h \
+ ../system/include/stm32f3xx/stm32f3xx_hal_uart_ex.h \
  ../include/stm32f3xx_it.h
 
 ../include/main.h:
@@ -86,5 +88,9 @@ src/stm32f3xx_it.o: ../src/stm32f3xx_it.c ../include/main.h \
 ../system/include/stm32f3xx/stm32f3xx_hal_spi.h:
 
 ../system/include/stm32f3xx/stm32f3xx_hal_spi_ex.h:
+
+../system/include/stm32f3xx/stm32f3xx_hal_uart.h:
+
+../system/include/stm32f3xx/stm32f3xx_hal_uart_ex.h:
 
 ../include/stm32f3xx_it.h:
