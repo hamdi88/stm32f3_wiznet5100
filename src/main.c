@@ -137,8 +137,10 @@ int main(void)
 	uint8_t retVal, sockStatus;
 	int16_t rcvLen;
 	uint8_t rcvBuf[20], bufSize[] = {2, 2, 2, 2};
-	uint32_t ticks=0, i=0;;
-	trace_initialize();
+	uint32_t ticks=0, i=0;
+	uint8_t output_msg[64] = "";
+
+	//trace_initialize();
 	/* USER CODE END 1 */
 
 	/* MCU Configuration--------------------------------------------------------*/
@@ -176,10 +178,11 @@ int main(void)
 			.gw 	= {192, 168, 2, 1}};					// Gateway address
 	wizchip_setnetinfo(&netInfo);
 	wizchip_getnetinfo(&netInfo);
-	trace_puts("Starting demo\n");
-	HAL_UART_Transmit(&huart1, "starting from stm32 uart\n\r", 64, 100);
-	sprintf(msg, "ip: %d.%d.%d.%d\r\n", netInfo.ip[0], netInfo.ip[1], netInfo.ip[2], netInfo.ip[3]);
-	HAL_UART_Transmit(&huart1, msg, strlen(msg), 100);
+	//trace_puts("Starting demo\n");
+	HAL_UART_Transmit(&huart1, (uint8_t *)WELCOME_MSG, strlen(WELCOME_MSG), 100);
+	sprintf(output_msg, "ip: %d.%d.%d.%d\r\n", netInfo.ip[0], netInfo.ip[1], netInfo.ip[2], netInfo.ip[3]);
+	HAL_UART_Transmit(&huart1, output_msg, strlen(output_msg), 100);
+	//output_msg = "";
 
 	reconnect:
 
@@ -207,37 +210,40 @@ int main(void)
 					/* Let's send a welcome message and closing socket */
 
 					recv(0, msg_rcv, sizeof(msg_rcv));
-					trace_puts(msg_rcv);
+					//trace_puts(msg_rcv);
 
 					ticks = HAL_GetTick();
 					sprintf(msg, "time since boot is : %lu ms\nwafa :\"(\n", ticks);
 
 					if(retVal = send(0, msg, strlen(msg)))
+					{
 						//PRINT_STR(SENT_MESSAGE_MSG);
-						trace_puts(SENT_MESSAGE_MSG);
+						//trace_puts(SENT_MESSAGE_MSG);
+					}
 					else { /* Ops: something went wrong during data transfer */
 						sprintf(msg, WRONG_RETVAL_MSG, retVal);
 						//PRINT_STR(msg);
-						trace_puts(msg);
+						//trace_puts(msg);
 					}
 					break;
 				}
 				else { /* Something went wrong with remote peer, maybe the connection was closed unexpectedly */
 					sprintf(msg, WRONG_STATUS_MSG, sockStatus);
 					//PRINT_STR(msg);
-					trace_puts(msg);
+					//trace_puts(msg);
 					break;
 				}
 			}
 
-		} else /* Ops: socket not in LISTEN mode. Something went wrong */
+		} else {/* Ops: socket not in LISTEN mode. Something went wrong */
 			//PRINT_STR(LISTEN_ERR_MSG);
-			trace_puts(LISTEN_ERR_MSG);
-
+			//trace_puts(LISTEN_ERR_MSG);
+		}
 	} else { /* Can't open the socket. This means something is wrong with W5100 configuration: maybe SPI issue? */
-		sprintf(msg, WRONG_RETVAL_MSG, retVal);
+		sprintf(output_msg, WRONG_RETVAL_MSG, retVal);
+		HAL_UART_Transmit(&huart1, output_msg, strlen(output_msg), 100);
 		//PRINT_STR(msg);
-		trace_puts(msg);
+		//trace_puts(msg);
 	}
 
 	/* We close the socket and start a connection again */
