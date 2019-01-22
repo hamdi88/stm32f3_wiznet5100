@@ -44,6 +44,7 @@
 #include "diag/Trace.h"
 #include "socket.h"
 #include "string.h"
+#include  <stdlib.h>
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -71,6 +72,8 @@
 #define WRONG_RETVAL_MSG	 "Something went wrong; return value: %d\r\n"
 #define WRONG_STATUS_MSG	 "Something went wrong; STATUS: %d\r\n"
 #define LISTEN_ERR_MSG	"LISTEN Error!\r\n"
+
+#define NETWORK_MENU_MSG	" 		Network Configuration\n\r1-modify IP address\n\r2-modify Subnet mask\n\r3-modify Gateway address\n\r"
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -101,6 +104,7 @@ static void MX_SPI1_Init(void);
 static void MX_USB_PCD_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_UART1_Init();
+static void network_configMenu();
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -194,7 +198,8 @@ int main(void)
 			while(sockStatus = getSn_SR(0) == SOCK_LISTEN)
 			{
 				HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
-				HAL_Delay(100);
+				network_configMenu();
+				//HAL_Delay(100);
 			}
 			/* OK. Got a remote peer. Let's send a message to it */
 			while(1) {
@@ -547,7 +552,52 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void network_configMenu()
+{
+	uint8_t str[64]="", input_msg[64]="", i=0;
+	wiz_NetInfo netInfo ;
 
+
+	HAL_UART_Receive(&huart1, input_msg, 2, 500);
+	if (!strncmp(input_msg, "++", 2))
+	{
+		HAL_UART_Transmit(&huart1, SEPARATOR, strlen(SEPARATOR), 100);
+		HAL_UART_Transmit(&huart1, NETWORK_MENU_MSG, strlen(NETWORK_MENU_MSG), 100);
+
+		HAL_UART_Receive(&huart1, (uint8_t *)input_msg, 1, HAL_MAX_DELAY);
+		wizchip_getnetinfo(&netInfo);
+		switch (input_msg[0]) {
+		case '1':
+			strcpy(str, "\r\nPlease enter IP address and press Enter \n\r");
+			HAL_UART_Transmit(&huart1,str, strlen(str), 100);
+			strcpy(input_msg, "");
+			do
+			{
+				HAL_UART_Receive(&huart1, (uint8_t *)input_msg+i, 1, HAL_MAX_DELAY);
+				i++;
+
+			}
+			while(input_msg[i-1] != 0x0D & i <64);
+			input_msg[i] = 0 ;
+			sprintf(str, "new address IP :%s\r\n", input_msg);
+			HAL_UART_Transmit(&huart1, str, strlen(str) , 100);
+
+			break;
+
+		case '2':
+			strcpy(str, "\r\nPlease enter Subnet Mask \n\r");
+			HAL_UART_Transmit(&huart1,str, strlen(str), 100);
+
+			break ;
+
+		default:
+			break;
+		}
+
+
+	}
+
+}
 /* USER CODE END 4 */
 
 /**
